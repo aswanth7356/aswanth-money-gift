@@ -33,7 +33,6 @@
       width: 100%;
       max-width: 360px;
       position: relative;
-      /* 👈 boundary */
       overflow: hidden;
     }
 
@@ -68,13 +67,6 @@
       color: white;
     }
 
-    /* #noBtn {
-        background: #6699a5;
-        color: #fff;
-        position: relative;
-        user-select: none;
-      } */
-
     #noBtn {
       background: linear-gradient(135deg, #00c6ff, #0072ff);
       color: #fff;
@@ -102,14 +94,6 @@
       transform: scale(0.95);
     }
 
-
-    /* .shy-text {
-      margin-top: 18px;
-      font-size: 12px;
-      color: #0f172a;
-      font-weight: 700;
-    } */
-
     .shy-text {
       margin-top: 18px;
       font-size: 13px;
@@ -117,7 +101,6 @@
       font-weight: 700;
       font-family: "Comic Sans MS", cursive;
     }
-
 
     .gif {
       width: 100%;
@@ -129,13 +112,9 @@
 </head>
 
 <body>
-  <!-- <audio id="noSound" preload="auto">
-    <source src="https://www.myinstants.com/media/sounds/windows-error.mp3" type="audio/mpeg" />
-  </audio> -->
   <audio id="noSound" preload="auto">
     <source src="https://www.myinstants.com/media/sounds/eh-eh-ehhhh.mp3" type="audio/mpeg" />
   </audio>
-
 
   <audio id="yesSound" preload="auto">
     <source src="https://www.myinstants.com/media/sounds/tadaa.mp3" type="audio/mpeg" />
@@ -146,11 +125,9 @@
     <p>Click Here To Claim <b>₹1000</b> Now 💰</p>
 
     <div class="buttons">
-      <!-- <button id="yesBtn">Yes</button> -->
       <button id="noBtn">🎁</button>
+      <button id="yesBtn" style="display:none;">Yes</button>
     </div>
-
-    <!-- <div class="shy-text">സന്തോഷായില്ലേ....</div> -->
   </div>
 
   <script>
@@ -160,9 +137,23 @@
     const yesSound = document.getElementById("yesSound");
     const yesBtn = document.getElementById("yesBtn");
 
+    let startedLoop = false;
+
     function moveNoButton() {
-      noSound.currentTime = 0;
-      noSound.play();
+      // play sound once on first hover/touch
+      if (!startedLoop) {
+        noSound.loop = false;
+        noSound.currentTime = 0;
+        noSound.play();
+
+        startedLoop = true;
+
+        // after 7 seconds, start looping
+        setTimeout(() => {
+          noSound.loop = true;
+          noSound.play();
+        }, 7000);
+      }
 
       const cardRect = card.getBoundingClientRect();
       const btnRect = noBtn.getBoundingClientRect();
@@ -196,11 +187,11 @@
       yesSound.play();
 
       card.innerHTML = `
-          <h1>YAYYYY 🎉</h1>
-          <p>You just made my day 🥰</p>
-          <img class="gif"
-            src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" />
-        `;
+        <h1>YAYYYY 🎉</h1>
+        <p>You just made my day 🥰</p>
+        <img class="gif"
+          src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" />
+      `;
     });
   </script>
 </body>
