@@ -33,7 +33,6 @@
       width: 100%;
       max-width: 360px;
       position: relative;
-      /* 👈 boundary */
       overflow: hidden;
     }
 
@@ -63,18 +62,6 @@
       transition: 0.3s ease;
     }
 
-    #yesBtn {
-      background: #ff4d6d;
-      color: white;
-    }
-
-    /* #noBtn {
-        background: #6699a5;
-        color: #fff;
-        position: relative;
-        user-select: none;
-      } */
-
     #noBtn {
       background: linear-gradient(135deg, #00c6ff, #0072ff);
       color: #fff;
@@ -102,22 +89,13 @@
       transform: scale(0.95);
     }
 
-
-    /* .shy-text {
-      margin-top: 18px;
-      font-size: 12px;
-      color: #0f172a;
-      font-weight: 700;
-    } */
-
     .shy-text {
-  margin-top: 18px;
-  font-size: 13px;
-  color: #6366f1;
-  font-weight: 700;
-  font-family: "Comic Sans MS", cursive;
-}
-
+      margin-top: 18px;
+      font-size: 13px;
+      color: #6366f1;
+      font-weight: 700;
+      font-family: "Comic Sans MS", cursive;
+    }
 
     .gif {
       width: 100%;
@@ -129,12 +107,9 @@
 </head>
 
 <body>
-  <audio id="noSound" preload="auto">
-    <source src="https://www.myinstants.com/media/sounds/windows-error.mp3" type="audio/mpeg" />
-  </audio>
 
-  <audio id="yesSound" preload="auto">
-    <source src="https://www.myinstants.com/media/sounds/tadaa.mp3" type="audio/mpeg" />
+  <audio id="noSound" preload="auto">
+    <source src="./Eh.mp3" type="audio/mpeg" />
   </audio>
 
   <div class="card" id="card">
@@ -142,23 +117,26 @@
     <p>Click Here To Claim <b>₹1000</b> Now 💰</p>
 
     <div class="buttons">
-      <!-- <button id="yesBtn">Yes</button> -->
       <button id="noBtn">🎁</button>
     </div>
 
-    <div class="shy-text">സന്തോഷായില്ലേ....</div>
+    <!-- <div class="shy-text">സന്തോഷായില്ലേ....</div> -->
   </div>
 
   <script>
     const noBtn = document.getElementById("noBtn");
     const card = document.getElementById("card");
     const noSound = document.getElementById("noSound");
-    const yesSound = document.getElementById("yesSound");
-    const yesBtn = document.getElementById("yesBtn");
+
+    let soundPlayed = false;
 
     function moveNoButton() {
-      noSound.currentTime = 0;
-      noSound.play();
+
+      if (!soundPlayed) {
+        noSound.currentTime = 0;
+        noSound.play();
+        soundPlayed = true;
+      }
 
       const cardRect = card.getBoundingClientRect();
       const btnRect = noBtn.getBoundingClientRect();
@@ -186,19 +164,8 @@
         moveNoButton();
       }
     });
-
-    yesBtn.addEventListener("click", () => {
-      yesSound.currentTime = 0;
-      yesSound.play();
-
-      card.innerHTML = `
-          <h1>YAYYYY 🎉</h1>
-          <p>You just made my day 🥰</p>
-          <img class="gif"
-            src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" />
-        `;
-    });
   </script>
+
 </body>
 
 </html>
