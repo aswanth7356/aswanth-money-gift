@@ -132,7 +132,6 @@
       position: relative;
       overflow: hidden;
       display: none;
-      /* hidden until loader ends */
       animation: popUp 0.7s ease;
     }
 
@@ -239,7 +238,6 @@
 
     <p style="font-size:14px; opacity:0.8;">Almost done... 😄</p>
 
-    <!-- sparkles -->
     <div class="sparkle" style="top:80%; left:20%;"></div>
     <div class="sparkle" style="top:85%; left:60%;"></div>
     <div class="sparkle" style="top:75%; left:80%;"></div>
@@ -277,52 +275,30 @@
     const yesSound = document.getElementById("yesSound");
 
     let startedLoop = false;
-    let audioUnlocked = false;
 
-    // ✅ preload sounds while loader runs
-    window.addEventListener("load", () => {
-      noSound.load();
-      yesSound.load();
-    });
-
-    // ✅ Unlock audio on first click (important for mobile)
-    document.body.addEventListener("click", () => {
-      if (!audioUnlocked) {
-        audioUnlocked = true;
-
-        noSound.play().then(() => {
-          noSound.pause();
-          noSound.currentTime = 0;
-        }).catch(() => { });
-
-        yesSound.play().then(() => {
-          yesSound.pause();
-          yesSound.currentTime = 0;
-        }).catch(() => { });
-      }
-    }, { once: true });
-
-    // ✅ Loader stays 5 seconds then show main card
+    // Loader stays 5 seconds then show main card
     setTimeout(() => {
       loader.style.display = "none";
       card.style.display = "block";
+
+      // ✅ Download audio fully while loader runs (instant play later)
+      fetch(noSound.querySelector("source").src)
+        .then(res => res.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          noSound.src = url;
+        });
+
+      fetch(yesSound.querySelector("source").src)
+        .then(res => res.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          yesSound.src = url;
+        });
+
     }, 5000);
 
     function moveNoButton() {
-
-      if (!startedLoop) {
-        noSound.loop = false;
-        noSound.currentTime = 0;
-        noSound.play();
-
-        startedLoop = true;
-
-        setTimeout(() => {
-          noSound.loop = true;
-          noSound.play();
-        }, 7000);
-      }
-
       const cardRect = card.getBoundingClientRect();
       const btnRect = noBtn.getBoundingClientRect();
 
@@ -339,13 +315,19 @@
       noBtn.style.top = y + "px";
     }
 
-    noBtn.addEventListener("pointerenter", (e) => {
-      if (e.pointerType === "mouse") moveNoButton();
+    // ✅ Hover sound (instant)
+    noBtn.addEventListener("mouseenter", () => {
+      noSound.currentTime = 0;
+      noSound.play();
+      moveNoButton();
     });
 
+    // ✅ Touch support
     noBtn.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "touch") {
         e.preventDefault();
+        noSound.currentTime = 0;
+        noSound.play();
         moveNoButton();
       }
     });
@@ -366,6 +348,7 @@
 </body>
 
 </html>
+
 
 
 
