@@ -22,8 +22,105 @@
       align-items: center;
       font-family: "Poppins", sans-serif;
       padding: 20px;
+      overflow: hidden;
     }
 
+    /* ================= LOADER SCREEN ================= */
+    .loader-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #ff4d6d, #ffb199);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 999;
+      color: white;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .loader-screen h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .loader-screen p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .coin {
+      font-size: 70px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 25px;
+      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.25));
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotateY(0deg);
+      }
+
+      100% {
+        transform: rotateY(360deg);
+      }
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      width: 260px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: white;
+      border-radius: 20px;
+      animation: loadProgress 7s linear forwards;
+    }
+
+    @keyframes loadProgress {
+      0% {
+        width: 0%;
+      }
+
+      100% {
+        width: 100%;
+      }
+    }
+
+    /* Sparkle Effect */
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      animation: sparkleMove 2s linear infinite;
+    }
+
+    @keyframes sparkleMove {
+      0% {
+        transform: translateY(0px) scale(0.7);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(-120px) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    /* ================= MAIN CARD ================= */
     .card {
       background: #fff;
       padding: 30px 20px 50px;
@@ -34,6 +131,21 @@
       max-width: 360px;
       position: relative;
       overflow: hidden;
+      display: none;
+      /* hidden until loader ends */
+      animation: popUp 0.7s ease;
+    }
+
+    @keyframes popUp {
+      0% {
+        transform: scale(0.7);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     h1 {
@@ -100,10 +212,39 @@
       margin-top: 20px;
       border-radius: 15px;
     }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 
 <body>
+
+  <!-- ============ LOADER SCREEN ============ -->
+  <div class="loader-screen" id="loader">
+    <div class="coin">💰</div>
+    <h1>Loading Your ₹1000...</h1>
+    <p>Please wait, verifying transaction 💸</p>
+
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+
+    <p style="font-size:14px; opacity:0.8;">Almost done... 😄</p>
+
+    <!-- sparkles -->
+    <div class="sparkle" style="top:80%; left:20%;"></div>
+    <div class="sparkle" style="top:85%; left:60%;"></div>
+    <div class="sparkle" style="top:75%; left:80%;"></div>
+    <div class="sparkle" style="top:90%; left:40%;"></div>
+  </div>
 
   <!-- Sounds -->
   <audio id="noSound" preload="auto">
@@ -114,6 +255,7 @@
     <source src="https://www.myinstants.com/media/sounds/tadaa.mp3" type="audio/mpeg" />
   </audio>
 
+  <!-- ============ MAIN CARD ============ -->
   <div class="card" id="card">
     <h1>Free Money Challenge</h1>
     <p>Click Here To Claim <b>₹1000</b> Now 💰</p>
@@ -125,22 +267,25 @@
   </div>
 
   <script>
-    const noBtn = document.getElementById("noBtn");
+    const loader = document.getElementById("loader");
     const card = document.getElementById("card");
+
+    const noBtn = document.getElementById("noBtn");
     const noSound = document.getElementById("noSound");
-    const yesSound = document.getElementById("yesSound");
+
     const yesBtn = document.getElementById("yesBtn");
+    const yesSound = document.getElementById("yesSound");
 
     let startedLoop = false;
     let audioUnlocked = false;
 
-    // ✅ Force load audio early
+    // ✅ preload sounds while loader runs
     window.addEventListener("load", () => {
       noSound.load();
       yesSound.load();
     });
 
-    // ✅ Unlock audio instantly after first click/tap anywhere
+    // ✅ Unlock audio on first click (important for mobile)
     document.body.addEventListener("click", () => {
       if (!audioUnlocked) {
         audioUnlocked = true;
@@ -157,8 +302,14 @@
       }
     }, { once: true });
 
+    // ✅ Loader stays 5 seconds then show main card
+    setTimeout(() => {
+      loader.style.display = "none";
+      card.style.display = "block";
+    }, 7000);
+
     function moveNoButton() {
-      // ✅ play sound instantly
+
       if (!startedLoop) {
         noSound.loop = false;
         noSound.currentTime = 0;
@@ -166,7 +317,6 @@
 
         startedLoop = true;
 
-        // after 7 seconds, start looping
         setTimeout(() => {
           noSound.loop = true;
           noSound.play();
@@ -189,12 +339,10 @@
       noBtn.style.top = y + "px";
     }
 
-    // mouse hover
     noBtn.addEventListener("pointerenter", (e) => {
       if (e.pointerType === "mouse") moveNoButton();
     });
 
-    // touch
     noBtn.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "touch") {
         e.preventDefault();
@@ -202,7 +350,6 @@
       }
     });
 
-    // yes button click
     yesBtn.addEventListener("click", () => {
       yesSound.currentTime = 0;
       yesSound.play();
@@ -219,10 +366,6 @@
 </body>
 
 </html>
-
-
-
-
 
 
 
