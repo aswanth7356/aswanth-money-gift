@@ -94,14 +94,6 @@
       transform: scale(0.95);
     }
 
-    .shy-text {
-      margin-top: 18px;
-      font-size: 13px;
-      color: #6366f1;
-      font-weight: 700;
-      font-family: "Comic Sans MS", cursive;
-    }
-
     .gif {
       width: 100%;
       max-width: 220px;
@@ -112,6 +104,8 @@
 </head>
 
 <body>
+
+  <!-- Sounds -->
   <audio id="noSound" preload="auto">
     <source src="https://www.myinstants.com/media/sounds/eh-eh-ehhhh.mp3" type="audio/mpeg" />
   </audio>
@@ -138,9 +132,33 @@
     const yesBtn = document.getElementById("yesBtn");
 
     let startedLoop = false;
+    let audioUnlocked = false;
+
+    // ✅ Force load audio early
+    window.addEventListener("load", () => {
+      noSound.load();
+      yesSound.load();
+    });
+
+    // ✅ Unlock audio instantly after first click/tap anywhere
+    document.body.addEventListener("click", () => {
+      if (!audioUnlocked) {
+        audioUnlocked = true;
+
+        noSound.play().then(() => {
+          noSound.pause();
+          noSound.currentTime = 0;
+        }).catch(() => { });
+
+        yesSound.play().then(() => {
+          yesSound.pause();
+          yesSound.currentTime = 0;
+        }).catch(() => { });
+      }
+    }, { once: true });
 
     function moveNoButton() {
-      // play sound once on first hover/touch
+      // ✅ play sound instantly
       if (!startedLoop) {
         noSound.loop = false;
         noSound.currentTime = 0;
@@ -171,10 +189,12 @@
       noBtn.style.top = y + "px";
     }
 
+    // mouse hover
     noBtn.addEventListener("pointerenter", (e) => {
       if (e.pointerType === "mouse") moveNoButton();
     });
 
+    // touch
     noBtn.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "touch") {
         e.preventDefault();
@@ -182,6 +202,7 @@
       }
     });
 
+    // yes button click
     yesBtn.addEventListener("click", () => {
       yesSound.currentTime = 0;
       yesSound.play();
@@ -194,6 +215,7 @@
       `;
     });
   </script>
+
 </body>
 
 </html>
