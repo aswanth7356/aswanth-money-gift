@@ -85,7 +85,7 @@
       width: 0%;
       background: white;
       border-radius: 20px;
-      animation: loadProgress 7s linear forwards;
+      animation: loadProgress 5s linear forwards;
     }
 
     @keyframes loadProgress {
@@ -132,6 +132,7 @@
       position: relative;
       overflow: hidden;
       display: none;
+      /* hidden until loader ends */
       animation: popUp 0.7s ease;
     }
 
@@ -176,7 +177,6 @@
     #yesBtn {
       background: #ff4d6d;
       color: white;
-      display: none;
     }
 
     #noBtn {
@@ -248,7 +248,7 @@
 
   <!-- Sounds -->
   <audio id="noSound" preload="auto">
-    <source src="https://www.myinstants.com/media/sounds/fahhhhhhhhhhhhhh.mp3" type="audio/mpeg" />
+    <source src="https://www.myinstants.com/media/sounds/eh-eh-ehhhh.mp3" type="audio/mpeg" />
   </audio>
 
   <audio id="yesSound" preload="auto">
@@ -262,7 +262,7 @@
 
     <div class="buttons">
       <button id="noBtn">🎁</button>
-      <button id="yesBtn">Yes</button>
+      <button id="yesBtn" style="display:none;">Yes</button>
     </div>
   </div>
 
@@ -277,21 +277,39 @@
     const yesSound = document.getElementById("yesSound");
 
     let startedLoop = false;
+    let audioUnlocked = false;
 
-    // ✅ preload sounds while loader runs (no autoplay)
+    // ✅ preload sounds while loader runs
     window.addEventListener("load", () => {
       noSound.load();
       yesSound.load();
     });
 
-    // ✅ Loader stays 7 seconds then show main card
+    // ✅ Unlock audio on first click (important for mobile)
+    document.body.addEventListener("click", () => {
+      if (!audioUnlocked) {
+        audioUnlocked = true;
+
+        noSound.play().then(() => {
+          noSound.pause();
+          noSound.currentTime = 0;
+        }).catch(() => { });
+
+        yesSound.play().then(() => {
+          yesSound.pause();
+          yesSound.currentTime = 0;
+        }).catch(() => { });
+      }
+    }, { once: true });
+
+    // ✅ Loader stays 5 seconds then show main card
     setTimeout(() => {
       loader.style.display = "none";
       card.style.display = "block";
-    }, 7000);
+    }, 5000);
 
     function moveNoButton() {
-      // ✅ sound only starts when user hovers/touches button
+
       if (!startedLoop) {
         noSound.loop = false;
         noSound.currentTime = 0;
@@ -299,7 +317,6 @@
 
         startedLoop = true;
 
-        // after 7 seconds start looping
         setTimeout(() => {
           noSound.loop = true;
           noSound.play();
@@ -322,12 +339,10 @@
       noBtn.style.top = y + "px";
     }
 
-    // ✅ hover sound + move
     noBtn.addEventListener("pointerenter", (e) => {
       if (e.pointerType === "mouse") moveNoButton();
     });
 
-    // ✅ touch support
     noBtn.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "touch") {
         e.preventDefault();
@@ -351,6 +366,8 @@
 </body>
 
 </html>
+
+
 
 
 
